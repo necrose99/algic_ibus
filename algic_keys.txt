@@ -1,0 +1,17 @@
+### Algic Language Custom IBus Table
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION = 1.0
+NAME = Algic_Input_Matrix
+LANG = mia,pot,kik,bla
+ICON = keyboard
+
+BEGIN_CHAR_DEF
+s^	š
+S^	Š
+z^  ž
+c^  č
+a-  ā
+e-  ē
+i-  ī
+o-  ō
+END_CHAR_DEF

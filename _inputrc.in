@@ -1,0 +1,20 @@
+# ~/.inputrc
+#!/usr/bin/env bash
+# Algic Language Keystroke Mapping Matrix
+
+# Map Alt + Key combinations to output native glyphs
+"\es": "š"
+"\ez": "ž"
+"\ec": "č"
+
+# Map Alt + Vowel combinations for Macrons (Miami-Illinois/Potawatomi)
+"\ea": "ā"
+"\ee": "ē"
+"\ei": "ī"
+"\eo": "ō"
+
+# Map Alt + Shift + Vowel for Uppercase Macrons
+"\eA": "Ā"
+"\eE": "Ē"
+"\eI": "Ī"
+"\eO": "Ō"
