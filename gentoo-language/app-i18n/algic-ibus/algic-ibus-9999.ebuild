@@ -3,14 +3,13 @@
 
 EAPI=8
 
-# --- Dynamic 9999 Git-R3 vs Static Tarball Logic ---
+# --- Mobile-Friendly 9999 Git-R3 vs Static Tarball Hybrid Logic ---
 if [[ ${PV} == 9999 ]]; then
 	inherit git-r3
-	EGIT_REPO_URI="https://github.com/necrose99/algic_ibus/"
-	# Force no keywords for the live 9999 build to keep it masked by default
+	EGIT_REPO_URI="https://github.com"
 	KEYWORDS=""
 else
-	SRC_URI="https://github.com/necrose99/{PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="https://github.com{PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86 ~arm"
 fi
 
@@ -21,36 +20,29 @@ LICENSE="GPL-2"
 SLOT="0"
 IUSE="readline"
 
-# --- Compilation & Runtime Dependencies ---
 BDEPEND="
 	app-i18n/ibus
 	app-i18n/ibus-table
 "
-
 RDEPEND="
 	app-i18n/ibus
 	app-i18n/ibus-table
 	readline? ( sys-libs/readline )
 "
 
-# Set the source directory depending on whether it came from Git or a Tarball
 if [[ ${PV} != 9999 ]]; then
 	S="${WORKDIR}/${PN}-${PV}"
 fi
 
 src_unpack() {
 	if [[ ${PV} == 9999 ]]; then
-		# Pull live head directly from the GitHub master/main branch
 		git-r3_src_unpack
 	else
-		# Default standard archive decompression fallback loop
 		default
 	fi
 }
 
 src_compile() {
-	einfo "Compiling plain-text layout matrices into active database structure..."
-	# Compile text database file explicitly within the sandboxed build environment
 	ibus-table-createdb -n algic_keys.db -s algic_keys.txt || die "Database compilation failed"
 }
 
@@ -65,23 +57,27 @@ src_install() {
 		newins _inputrc.in .inputrc
 	fi
 
-	# Deploy global multitenant documentation file structures natively 
+	# Deploy standard Readme.md documentation natively
 	einstalldocs
+
+	einfo "Deploying repository deployment engine for manual home space fallback..."
+	# Keeps install.sh executable (755) and targets a safe system directory
+	exeinto /usr/share/algic-ibus
+	doexe install.sh
+	
+	# Also copy the required input sources alongside it so install.sh can find them if invoked manually
+	insinto /usr/share/algic-ibus
+	doins _inputrc.in algic_keys.txt algic_keys.db
 }
 
 pkg_postinst() {
 	elog "========================================================================"
 	elog " ⌨️  Algic Keyboard Layout Framework (${PV}) Initialized!"
 	elog "========================================================================"
-	if [[ ${PV} == 9999 ]]; then
-		elog "👉 This is a live development build tracked via git-r3."
-		elog "   To update your mappings to latest commit on head, simply run:"
-		elog "   # emerge --all-members @live-rebuild"
-	fi
-	elog "------------------------------------------------------------------------"
-	elog "1. Restart your desktop session's active ibus-daemon instance to sync additions:"
-	elog "   $ ibus exit && ibus-daemon -drx"
-	elog "2. Open your Desktop Environment Keyboard settings panel under 'Input Methods'"
-	elog "   and click Add -> select your language -> choose 'Algic_Input_Matrix'."
+	elog "🛠️  USER ACCESSIBILITY & FALLBACK PATHS:"
+	elog "If IBus configurations break, or if other/existing users need to deploy"
+	elog "the layout matrices and terminal macros directly to their /home directories,"
+	elog "they can run the pre-bundled installer directly from the system share:"
+	elog "   $ cd /usr/share/algic-ibus && ./install.sh"
 	elog "========================================================================"
 }
