@@ -13,7 +13,7 @@
 		},
 
 		// --- Whitespace & Tab Alignment Hygiene ---
-		// This protects against breaking 'ibus-table-createdb' parser loops with literal spaces
+		// Protects against breaking 'ibus-table-createdb' parser loops with literal spaces
 		"[tsv]": {
 			"editor.insertSpaces": false,
 			"editor.tabSize": 8,
@@ -39,5 +39,42 @@
 			"**/*.db": true,
 			"build_output/": true
 		}
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "🔥 Bake Engine & Install",
+				"type": "shell",
+				"command": "chmod +x ./install.sh && ./install.sh",
+				"group": {
+					"kind": "build",
+					"isDefault": true
+				},
+				"presentation": {
+					"reveal": "always",
+					"panel": "shared",
+					"clear": true
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "🧪 Validate Tab Syntax",
+				"type": "shell",
+				"command": "if grep -E '^[^#].* ' algic_keys.txt | grep -qV 'BEGIN_TABLE\\|END_TABLE'; then echo '❌ Error: Spaces found instead of literal tabs!'; exit 1; else echo '✅ Tab formatting checks passed.'; fi",
+				"group": "test",
+				"presentation": {
+					"reveal": "silent",
+					"panel": "dedicated"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "🧹 Clean Build Artifacts",
+				"type": "shell",
+				"command": "rm -rf *.db build_output/ algic_ibus-linux-generic/",
+				"problemMatcher": []
+			}
+		]
 	}
 }
