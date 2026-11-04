@@ -6,16 +6,16 @@ UUID = a677b102-127c-486d-926f-9694e9f73f91
 SERIAL_NUMBER = 20261104
 NAME = Algic_Input_Matrix
 NAME.en = Algic Input Matrix
-LANGUAGES = mia,pot,kik,bla
+# ISO-639-3 languages added: alg (Proto-Algonquian), sac (Sauk/Fox), shw (Shawnee), yur (Yurok), wiy (Wiyot)
+LANGUAGES = mia,pot,kik,bla,alg,sac,shw,yur,wiy
 ICON = keyboard
-# CRITICAL: Append the apostrophe character here at the end of valid inputs
-VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-^'
-MAX_KEY_LENGTH = 2
+VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-^'?*+łɬθʔ
+MAX_KEY_LENGTH = 3
 AUTO_COMMIT = TRUE
 END_DEFINITION
 
 BEGIN_TABLE
-# Format: [Input Sequence] [Tab] [Output Unicode Symbol] [Tab] [Weight]
+# --- Existing Myaamia & Potawatomi Layers ---
 'e	é	100
 'E	É	100
 s^	š	100
@@ -26,7 +26,22 @@ a-	ā	100
 e-	ē	100
 i-	ī	100
 o-	ō	100
+# ezh	ézhgakweticks Potawatomi
 
-# Example Word expansion macro
-ezh	ézhgakweticks	100
+# --- Proto-Algonquian Historical Reconstruction Layer ---
+l^	ɬ	100
+L^	Ł	100
+*p	*p	100
+*t	*t	100
+*k	*k	100
+
+# --- Shawnee (shw) & Sauk / Fox (sac) Layout Matrix ---
+th	θ	100
+TH	Θ	100
+q'	ʔ	100
+
+# --- California Algic Isolates (Yurok / Wiyot) ---
+g^	ɣ	100
+l-	ł	100
+r-	ɹ	100
 END_TABLE
