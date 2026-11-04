@@ -1,17 +1,32 @@
-### Algic Language Custom IBus Table
 SCIM_Generic_Table_Phrase_Library_TEXT
-VERSION = 1.0
-NAME = Algic_Input_Matrix
-LANG = mia,pot,kik,bla
-ICON = keyboard
+VERSION_1_0
 
-BEGIN_CHAR_DEF
-s^	š
-S^	Š
-z^  ž
-c^  č
-a-  ā
-e-  ē
-i-  ī
-o-  ō
-END_CHAR_DEF
+BEGIN_DEFINITION
+UUID = a677b102-127c-486d-926f-9694e9f73f91
+SERIAL_NUMBER = 20261104
+NAME = Algic_Input_Matrix
+NAME.en = Algic Input Matrix
+LANGUAGES = mia,pot,kik,bla
+ICON = keyboard
+# CRITICAL: Append the apostrophe character here at the end of valid inputs
+VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-^'
+MAX_KEY_LENGTH = 2
+AUTO_COMMIT = TRUE
+END_DEFINITION
+
+BEGIN_TABLE
+# Format: [Input Sequence] [Tab] [Output Unicode Symbol] [Tab] [Weight]
+'e	é	100
+'E	É	100
+s^	š	100
+S^	Š	100
+z^	ž	100
+c^	č	100
+a-	ā	100
+e-	ē	100
+i-	ī	100
+o-	ō	100
+
+# Example Word expansion macro
+ezh	ézhgakweticks	100
+END_TABLE
