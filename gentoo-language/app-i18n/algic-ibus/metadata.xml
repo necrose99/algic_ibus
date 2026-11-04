@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://gentoo.org">
+<pkgmetadata>
+	<maintainer type="project">
+		<email>languages@gentoo.org</email>
+		<name>Gentoo Language Support Authors</name>
+		<description>Primary maintainer proxy engine for localized layout extensions and internationalization packages</description>
+	</maintainer>
+	<maintainer type="person">
+		<email>necrose99@gmail.com</email>
+		<name>necrose99</name>
+		<description>Upstream repository organizer and layout matrix configuration author</description>
+	</maintainer>
+	<longdescription lang="en">
+		A comprehensive localized keyboard configuration matrix and terminal binding ecosystem 
+		optimized for inputting Algic and Algonquian language orthographies. This engine provides 
+		native mapping translation rules for modern dialects, historical linguistic reconstructions, 
+		and geographical variants. It includes specific layout components for:
+		
+		- Miami-Illinois (Myaamia) and Potawatomi (supporting macrons and post-Z acute vowel structures like é)
+		- Sauk/Fox, Kickapoo, and Shawnee (supporting specialized theta and glottal markers)
+		- Proto-Algonquian historical reconstructions (providing the voiceless lateral fricative ɬ)
+		- California isolates including Yurok and Wiyot (mapping soft gamma ɣ and barred-l ł sequences)
+	</longdescription>
+	<slots>
+		<slot name="0">Primary architecture track. Multiple version branches are slot-compatible on 0.</slot>
+	</slots>
+	<use>
+		<flag name="readline">Deploys native keystroke chord and Alt-modifier macro profiles natively into global /etc/skel/.inputrc file mappings for command line interfaces</flag>
+	</use>
+	<upstream>
+		<maintainer type="person">
+			<name>necrose99</name>
+		</maintainer>
+		<remote-id type="github">necrose99/algic_ibus</remote-id>
+		<bugs-to>https://github.com</bugs-to>
+	</upstream>
+</pkgmetadata>
