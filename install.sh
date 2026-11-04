@@ -10,6 +10,7 @@ set -e # Exit immediately on internal command failures
 INPUT_SRC="_inputrc.in"
 TABLE_SRC="algic_keys.txt"
 DB_OUT="algic_keys.db"
+DOC_SRC="Readme.md"
 
 echo "========================================================================"
 echo " ⌨️  Algic Keyboard Layout Installer Engine (necrose99/algic_ibus)"
@@ -58,6 +59,14 @@ case "$REPLY" in
         echo "[*] Appending macros onto machine-wide runtime records (/etc/inputrc)..."
         sudo bash -c "cat $INPUT_SRC >> /etc/inputrc"
         
+        # --- Phase 3: Global Documentation Assets Deployment ---
+        if [ -f "$DOC_SRC" ]; then
+            echo "[*] Deploying global documentation files to system tree..."
+            sudo mkdir -p /usr/share/doc/algic-ibus
+            sudo cp "$DOC_SRC" /usr/share/doc/algic-ibus/README.md
+            sudo chmod 644 /usr/share/doc/algic-ibus/README.md
+        fi
+        
         echo "[+] Global deployment complete. All active and future accounts synchronized."
         ;;
         
@@ -69,6 +78,13 @@ case "$REPLY" in
         
         # Force the active open bash shell runtime instance to instantly parse modifications
         bind -f "$HOME/.inputrc" 2>/dev/null || echo "[*] Mapping bound. Restart terminal to fully activate layout rules."
+        
+        # --- Phase 3: User-Space Documentation Sandbox Deployment ---
+        if [ -f "$DOC_SRC" ]; then
+            echo "[*] Deploying documentation files to user-space repository cache..."
+            mkdir -p "$HOME/.local/share/doc/algic-ibus"
+            cp "$DOC_SRC" "$HOME/.local/share/doc/algic-ibus/README.md"
+        fi
         
         echo "[+] User-space deployment complete inside '$HOME/'."
         ;;
