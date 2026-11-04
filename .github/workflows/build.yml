@@ -19,6 +19,14 @@ jobs:
         run: |
           apk update
           apk add --no-cache ibus ibus-table bash tar gzip
+      - name: Verify Matrix Table Structure
+        run: |
+          # Ensure rows within the BEGIN_TABLE block contain true tabs, not space padding
+          if grep -E '^[^#].* ' algic_keys.txt | grep -qV 'BEGIN_TABLE\|END_TABLE'; then
+            echo "❌ Error: Space character detected in table entry row. Columns must be separated by literal tabs!"
+            exit 1
+          fi
+          echo "✅ Matrix layout syntax looks sound."
 
       - name: Compile and Structure Release Directory
         run: |
