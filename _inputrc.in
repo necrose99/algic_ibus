@@ -1,6 +1,6 @@
 # Algic Language Keystroke Mapping Matrix
 
-# Map Alt Modifier Layout Combinations
+# Core Diacritics (Myaamia / Potawatomi)
 "\es": "š"
 "\ez": "ž"
 "\ec": "č"
@@ -8,11 +8,14 @@
 "\ee": "ē"
 "\ei": "ī"
 "\eo": "ō"
-"\eA": "Ā"
-"\eE": "Ē"
-"\eI": "Ī"
-"\eO": "Ō"
-
-# Map Direct Sequential Chord Triggers for 'e and 'E
 "'e": "é"
 "'E": "É"
+
+# Proto-Algonquian & Central Dialect Extensions
+"\el": "ɬ"  # Alt + l -> Voiceless lateral fricative (Proto-Algonquian)
+"\eL": "Ł"  # Alt + Shift + l 
+"\et": "θ"  # Alt + t -> Theta (Shawnee / Sauk)
+"\eq": "ʔ"  # Alt + q -> Glottal Stop
+
+# California Isolates Extensions (Yurok / Wiyot)
+"\eg": "ɣ"  # Alt + g -> Gamma/Fricative g
