@@ -1,0 +1,99 @@
+name: Bake Generic Linux Tarball Release
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build_release:
+    runs-on: ubuntu-latest
+    container:
+      image: alpine:latest
+
+    steps:
+      - name: Checkout Repository Source
+        uses: actions/checkout@v4
+
+      - name: Install Alpine Dependencies
+        run: |
+          apk update
+          apk add --no-cache ibus ibus-table bash tar gzip
+
+      - name: Compile and Structure Release Directory
+        run: |
+          # 1. Define source assets
+          TABLE_SRC="algic_keys.txt"
+          DB_OUT="algic_keys.db"
+          INPUT_SRC="_inputrc.in"
+          
+          # 2. Compile the core database 
+          ibus-table-createdb -n "$DB_OUT" -s "$TABLE_SRC"
+          
+          # 3. Create a clean staging directory tree
+          STAGING_DIR="algic_ibus-linux-generic"
+          mkdir -p "$STAGING_DIR"
+          
+          # 4. Copy raw artifacts and copy compile results
+          cp "$DB_OUT" "$STAGING_DIR/"
+          cp "$INPUT_SRC" "$STAGING_DIR/inputrc.template"
+          cp Readme.md "$STAGING_DIR/"
+          
+          # 5. Inject a standalone runtime deployment install script into the tarball
+          cat << 'EOF' > "$STAGING_DIR/install.sh"
+          #!/bin/bash
+          set -e
+
+          echo "⌨ Installing Algic IBus Keyboard Layout & Terminal Bindings..."
+
+          # --- 1. System/User IBus Table Installation ---
+          if [ "$EUID" -eq 0 ]; then
+              # Global System installation path
+              TARGET_DIR="/usr/share/ibus-table/tables"
+              echo "-> Running as root. Installing globally to: $TARGET_DIR"
+              mkdir -p "$TARGET_DIR"
+              cp algic_keys.db "$TARGET_DIR/"
+          else
+              # Local user-space fallback path
+              TARGET_DIR="$HOME/.local/share/ibus-table/tables"
+              echo "-> Running as user. Installing to local profile: $TARGET_DIR"
+              mkdir -p "$TARGET_DIR"
+              cp algic_keys.db "$TARGET_DIR/"
+          fi
+
+          # --- 2. Local Terminal inputrc Append Macro Rules ---
+          INPUTRC_TARGET="$HOME/.inputrc"
+          if [ -f "inputrc.template" ]; then
+              echo "-> Mapping terminal macros to $INPUTRC_TARGET"
+              # Ensure file ends with a newline before appending
+              [ -f "$INPUTRC_TARGET" ] && sed -i -e '$a\' "$INPUTRC_TARGET"
+              cat inputrc.template >> "$INPUTRC_TARGET"
+          fi
+
+          # --- 3. Refresh Active Environment Daemon Bus Pipeline ---
+          echo "-> Cycling active background ibus-daemon configuration states..."
+          if command -v ibus >/dev/null 2>&1; then
+              ibus exit || true
+              rm -f $HOME/.cache/ibus/bus/*
+              ibus-daemon -drx
+              echo "✅ Success! Please navigate to your system Keyboard settings and append 'AlgicLayout'."
+          else
+              echo "⚠️ Warning: 'ibus' command not found. Please restart your desktop's IBus framework manually."
+          fi
+          EOF
+
+          # Make the inner installer executable
+          chmod +x "$STAGING_DIR/install.sh"
+
+          # 6. Compress staging folder into the generic tarball distribution bundle
+          tar -czf algic_ibus-linux-generic.tar.gz "$STAGING_DIR"
+          
+          # Move file out for easy artifact discovery
+          mkdir -p dist
+          mv algic_ibus-linux-generic.tar.gz dist/
+
+      - name: Upload Generic Release Tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: algic-linux-generic-release
+          path: dist/algic_ibus-linux-generic.tar.gz
