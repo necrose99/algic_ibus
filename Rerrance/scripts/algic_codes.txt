@@ -1,3 +1,7 @@
+#  Exsistes in scripts Myaamia repo.... 
+# know Algic codes Mappings 
+# Cree keyboards existing in ibus so not a need
+
 # Plains
 bla:Blackfoot
 arp:Arapaho
