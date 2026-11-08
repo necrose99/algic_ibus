@@ -1,1 +1,80 @@
+{
+	"folders": [
+		{
+			"name": "Algic Input Matrix Development",
+			"path": "."
+		}
+	],
+	"settings": {
+		// --- File Associations & Syntaxes ---
+		"files.associations": {
+			"*.in": "properties",        // Maps _inputrc.in with clean key/value highlighting
+			"algic_keys.txt": "tsv"       // Treats your data lookup matrix text table as TSV
+		},
 
+		// --- Whitespace & Tab Alignment Hygiene ---
+		// Protects against breaking 'ibus-table-createdb' parser loops with literal spaces
+		"[tsv]": {
+			"editor.insertSpaces": false,
+			"editor.tabSize": 8,
+			"editor.trimTrailingWhitespace": true
+		},
+		"[properties]": {
+			"editor.insertSpaces": false,
+			"editor.tabSize": 4
+		},
+		"[shellscript]": {
+			"editor.tabSize": 4,
+			"editor.insertSpaces": true
+		},
+
+		// --- Build/Output Exclusions ---
+		// Hides compiled binary blobs from bloating global fuzzy search buffers
+		"search.exclude": {
+			"**/*.db": true,
+			"build_output/": true,
+			"algic_ibus-linux-generic/": true
+		},
+		"files.watcherExclude": {
+			"**/*.db": true,
+			"build_output/": true
+		}
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "🔥 Bake Engine & Install",
+				"type": "shell",
+				"command": "chmod +x ./install.sh && ./install.sh",
+				"group": {
+					"kind": "build",
+					"isDefault": true
+				},
+				"presentation": {
+					"reveal": "always",
+					"panel": "shared",
+					"clear": true
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "🧪 Validate Tab Syntax",
+				"type": "shell",
+				"command": "if grep -E '^[^#].* ' algic_keys.txt | grep -qV 'BEGIN_TABLE\\|END_TABLE'; then echo '❌ Error: Spaces found instead of literal tabs!'; exit 1; else echo '✅ Tab formatting checks passed.'; fi",
+				"group": "test",
+				"presentation": {
+					"reveal": "silent",
+					"panel": "dedicated"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "🧹 Clean Build Artifacts",
+				"type": "shell",
+				"command": "rm -rf *.db build_output/ algic_ibus-linux-generic/",
+				"problemMatcher": []
+			}
+		]
+	}
+}
