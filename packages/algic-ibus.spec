@@ -24,3 +24,7 @@ Provides split sub-module translation keymaps for Algic linguistic variants.
 
 %files
 %{_datadir}/ibus-table/tables/algic_*.db
+%files
+%{_datadir}/ibus-table/tables/algic_*.db
+%{_datadir}/algic-ibus/inputrc/inputrc.*
+%config(noreplace) %{_sysconfdir}/profile.d/algic.sh
