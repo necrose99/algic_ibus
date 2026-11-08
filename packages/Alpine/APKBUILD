@@ -1,0 +1,23 @@
+# APKBUILD for necrose99/algic_ibus layout matrix
+pkgname="algic-ibus"
+pkgver="2026.11.08"
+pkgrel=0
+pkgdesc="Hierarchical split layout matrix for Algic language keymaps"
+url="https://github.com"
+# Lock package output straight to independent noarch distribution
+arch="noarch" 
+license="MIT"
+depends="ibus-table"
+makedepends="python3 ibus-table"
+source="$pkgname-$pkgver.tar.gz::https://github.com/archive/v$pkgver.tar.gz"
+builddir="$srcdir/algic_ibus-$pkgver"
+
+build() {
+	cd "$builddir"
+	make VERSION="$pkgver" all
+}
+
+package() {
+	cd "$builddir"
+	make DESTDIR="$pkgdir" PREFIX="/usr" install
+}
