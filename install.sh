@@ -1,95 +1,91 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Algic Keyboard Input Matrix - Deployment Pipeline Engine
+# Algic Keyboard Input Matrix - Modular Cross-Distro Build Engine
 # Maintainer: necrose99
-# Target Dialects: Miami-Illinois, Potawatomi, Kickapoo, Blackfoot
+# Target Dialects: Miami-Illinois (mia), Potawatomi (pot), Kickapoo (kik), Blackfoot (bla)
 # ==============================================================================
 
 set -e # Exit immediately on internal command failures
 
+# 1. Default Configuration & Path Fallbacks (Overrideable by Makefile/Ebuild)
+VERSION="${VERSION:-2026.11.08}"
+PREFIX="${PREFIX:-/usr}"
+DESTDIR="${DESTDIR:-}"
+
+# Deduce standard target distribution filesystem layouts
+TABLE_DIR="${DESTDIR}${PREFIX}/share/ibus-table/tables"
+INPUTRC_DIR="${DESTDIR}${PREFIX}/share/algic-ibus/inputrc"
+DOC_DIR="${DESTDIR}${PREFIX}/share/doc/algic-ibus-${VERSION}"
+
 INPUT_SRC="_inputrc.in"
 TABLE_SRC="algic_keys.txt"
-DB_OUT="algic_keys.db"
 DOC_SRC="Readme.md"
+BUILD_OUT="build_out"
+
+# Helper for unified logging
+log_info() { echo -e "\e[32m[*]\e[0m $1"; }
+log_warn() { echo -e "\e[33m[!]\e[0m $1"; }
 
 echo "========================================================================"
-echo " ⌨️  Algic Keyboard Layout Installer Engine (necrose99/algic_ibus)"
+echo " 🏗️  Algic Modular Compilation Pipeline Engine"
 echo "========================================================================"
 
 # ------------------------------------------------------------------------------
-# Phase 1: Compile IBus Layout Engine Database
+# Phase 1: Clean and Prepare Build Directory Staging Sandbox
 # ------------------------------------------------------------------------------
-if [ -f "$TABLE_SRC" ]; then
-    echo "[*] Compiling plain-text layout matrices into active database structure..."
-    ibus-table-createdb -n "$DB_OUT" -s "$TABLE_SRC"
-    
-    echo "[*] Elevating privileges to register database asset with IBus system..."
-    sudo cp "$DB_OUT" /usr/share/ibus-table/tables/
-    
-    echo "[*] Resetting active background IBus daemon wrapper engine..."
-    ibus-daemon -drx
-    echo "[+] IBus layout matrix successfully initialized!"
+rm -rf "$BUILD_OUT"
+mkdir -p "$BUILD_OUT"
+
+# ------------------------------------------------------------------------------
+# Phase 2: Execute Splitter Component Engines
+# ------------------------------------------------------------------------------
+if [ -f "split_algic.py" ]; then
+    log_info "Executing Python3 split matrix engine for version ${VERSION}..."
+    python3 split_algic.py "$TABLE_SRC" "$INPUT_SRC" "$BUILD_OUT" "$VERSION"
 else
-    echo "[!] Warning: '$TABLE_SRC' not found. Skipping IBus table compilation."
+    log_warn "split_algic.py script missing. Falling back to monolithic configuration."
+    # If python splitter is not used, manually stage items to build directory
+    cp "$INPUT_SRC" "$BUILD_OUT/inputrc.all"
+    if [ -f "$TABLE_SRC" ]; then
+        ibus-table-createdb -n "$BUILD_OUT/algic_keys.db" -s "$TABLE_SRC"
+    fi
 fi
 
-echo "------------------------------------------------------------------------"
+# ------------------------------------------------------------------------------
+# Phase 3: Stage Compiled Assets to Target Image (DestDir Installation)
+# ------------------------------------------------------------------------------
+# Check if the execution context is an actual install pass or just a local build pass
+if [ "$1" == "--install" ]; then
+    log_info "Installing layouts into target package image boundaries..."
 
-# ------------------------------------------------------------------------------
-# Phase 2: Deploy GNU Readline Mapping Environment Variables
-# ------------------------------------------------------------------------------
-if [ ! -f "$INPUT_SRC" ]; then
-    echo "[!] Critical Error: Mapping template source '$INPUT_SRC' is missing."
-    exit 1
+    # Deploy IBus Engines
+    if ls "$BUILD_OUT"/*.db &>/dev/null; then
+        mkdir -p "$TABLE_DIR"
+        cp "$BUILD_OUT"/*.db "$TABLE_DIR/"
+        chmod 644 "$TABLE_DIR"/*.db
+        log_info "Staged IBus engine binaries inside: $TABLE_DIR"
+    fi
+
+    # Deploy GNU Readline Split Sub-modules
+    if ls "$BUILD_OUT"/inputrc.* &>/dev/null; then
+        mkdir -p "$INPUTRC_DIR"
+        cp "$BUILD_OUT"/inputrc.* "$INPUTRC_DIR/"
+        chmod 644 "$INPUTRC_DIR"/*
+        log_info "Staged terminal profiles inside: $INPUTRC_DIR"
+    fi
+
+    # Deploy Package Documentation
+    if [ -f "$DOC_SRC" ]; then
+        mkdir -p "$DOC_DIR"
+        cp "$DOC_SRC" "$DOC_DIR/README.md"
+        chmod 644 "$DOC_DIR/README.md"
+        log_info "Staged global package layout blueprints inside: $DOC_DIR"
+    fi
+
+    echo "========================================================================"
+    log_info "Deployment staging finalized successfully!"
+    echo "========================================================================"
+else
+    log_info "Compilation completed inside local sandbox: ./${BUILD_OUT}/"
+    log_info "Run with '--install' or use your 'Makefile' to map to system targets."
 fi
-
-# Request deployment context parameters from user entry buffer
-read -p "Select Deployment Scope ([G]lobal System-wide / [U]ser Space Home Only): " -n 1 -r
-echo "" # Clean carriage return newline
-
-case "$REPLY" in
-    [Gg]* )
-        echo "[*] Initiating Global Multitenant Deployment..."
-        
-        # Seed automatic profile injection for all FUTURE user additions
-        echo "[*] Writing layout rules to global user skeleton directory..."
-        sudo cp "$INPUT_SRC" /etc/skel/.inputrc
-        
-        # Append layout macros onto all CURRENTLY existing active system terminals
-        echo "[*] Appending macros onto machine-wide runtime records (/etc/inputrc)..."
-        sudo bash -c "cat $INPUT_SRC >> /etc/inputrc"
-        
-        # --- Phase 3: Global Documentation Assets Deployment ---
-        if [ -f "$DOC_SRC" ]; then
-            echo "[*] Deploying global documentation files to system tree..."
-            sudo mkdir -p /usr/share/doc/algic-ibus
-            sudo cp "$DOC_SRC" /usr/share/doc/algic-ibus/README.md
-            sudo chmod 644 /usr/share/doc/algic-ibus/README.md
-        fi
-        
-        echo "[+] Global deployment complete. All active and future accounts synchronized."
-        ;;
-        
-    [Uu]* | * )
-        echo "[*] Initiating Local Single-User Space Deployment..."
-        
-        # Deploy configuration directly into the current active user home path partition
-        cp "$INPUT_SRC" "$HOME/.inputrc"
-        
-        # Force the active open bash shell runtime instance to instantly parse modifications
-        bind -f "$HOME/.inputrc" 2>/dev/null || echo "[*] Mapping bound. Restart terminal to fully activate layout rules."
-        
-        # --- Phase 3: User-Space Documentation Sandbox Deployment ---
-        if [ -f "$DOC_SRC" ]; then
-            echo "[*] Deploying documentation files to user-space repository cache..."
-            mkdir -p "$HOME/.local/share/doc/algic-ibus"
-            cp "$DOC_SRC" "$HOME/.local/share/doc/algic-ibus/README.md"
-        fi
-        
-        echo "[+] User-space deployment complete inside '$HOME/'."
-        ;;
-esac
-
-echo "========================================================================"
-echo "[+] Configuration sequence finalized with zero runtime loopholes!"
-echo "========================================================================"
