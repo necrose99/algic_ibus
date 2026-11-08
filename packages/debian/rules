@@ -1,0 +1,6 @@
+#!/usr/bin/make -f
+# Ensure debhelper knows how to stage paths natively
+%:
+	dh $@
+
+# Debhelper automatically calls 'make all' and 'make install DESTDIR=debian/algic-ibus'
